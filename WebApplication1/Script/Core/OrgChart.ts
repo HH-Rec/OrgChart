@@ -160,8 +160,8 @@
             this.properties.page.fill = "red";
 
             this.properties.node = {};
-            this.properties.node.width = 100;
-            this.properties.node.height = 50;
+            this.properties.node.width = 200;
+            this.properties.node.height = 100;
             this.properties.node.fill = "blue";
 
 
@@ -194,7 +194,7 @@
             var page = this.global.svg.snap.rect(0, 0, self.properties.page.width, self.properties.page.height).attr({ fill: self.properties.page.fill });
 
             page.click((arg) => {
-                self.global.activeNode = null;  
+                self.global.activeNode = null;
             });
 
             page.dblclick((arg) => {
@@ -244,9 +244,7 @@
         }
 
         private getNode(x: number, y: number): any {
-            var node = this.global.svg.snap.rect(x - this.properties.node.width / 2, y - this.properties.node.height / 2, this.properties.node.width, this.properties.node.height).attr({ fill: this.properties.node.fill });
-
-            var g = this.global.svg.snap.group(node);
+            var g;
 
             var move = (dx, dy) => {
                 var self = this;
@@ -258,6 +256,29 @@
             }
             var start = () => { g.data("origTransform", g.transform().local); }
             var stop = () => { }
+
+            var node = this.global.svg.snap.rect(x - this.properties.node.width / 2, y - this.properties.node.height / 2, this.properties.node.width, this.properties.node.height).attr({ fill: this.properties.node.fill });
+
+            //var circleTopLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+            //var circleTopCenter = this.global.svg.snap.circle(x, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+            //var circleTopRight = this.global.svg.snap.circle(x + this.properties.node.width / 2, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+            var circleRight = this.global.svg.snap.circle(x + this.properties.node.width / 2 - 30, y, 10).attr({ fill: "yellow" });
+            circleRight.drag(move, start, stop);
+            //var circleBottomRight = this.global.svg.snap.circle(x + this.properties.node.width / 2, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+            //var circleBottomCenter = this.global.svg.snap.circle(x, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+            //var circleBottomLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+            var circleLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2 + 30, y, 10).attr({ fill: "yellow" });
+            circleLeft.mouseover((arg) => {
+            });
+            circleLeft.mouseover((arg) => {
+            });
+            circleLeft.click((arg) => {
+                circleLeft.drag(move, start, stop);
+                this.global.activeEdge.start = this.getClickedPosition(arg);
+            });
+            
+            g = this.global.svg.snap.group(node,  circleRight, circleLeft);
+
             g.drag(move, start, stop);
 
             this.global.activeNode = g;
@@ -267,39 +288,16 @@
             });
 
             g.mouseover(() => {
-                debugger;
-                //var circleTopLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-                var circleTopCenter = this.global.svg.snap.circle(x, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-                //var circleTopRight = this.global.svg.snap.circle(x + this.properties.node.width / 2, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-                var circleRight = this.global.svg.snap.circle(x + this.properties.node.width / 2 - 10, y, 10).attr({ fill: "yellow" });
-
-
-                circleRight.drag(move, start, stop);
-
-                //var circleBottomRight = this.global.svg.snap.circle(x + this.properties.node.width / 2, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-                var circleBottomCenter = this.global.svg.snap.circle(x, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-                //var circleBottomLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-                var circleLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2 + 10, y, 10).attr({ fill: "yellow" });
-                circleLeft.click((arg) => {
-                    debugger;
-                    this.global.activeEdge.start = this.getClickedPosition(arg);
-                });
-
-                g.add(circleTopCenter, circleRight, circleBottomCenter, circleLeft);
+               
             });
 
             g.mouseout(() => {
-                debugger;
-                g[1].remove();
-                g[1].remove();
-                g[1].remove();
-                g[1].remove();
             });
 
             g.mousemove(() => {
                 if (this.global.activeEdge.start !== null) {
-                    debugger;
-                }});
+                }
+            });
 
             return g;
         }
