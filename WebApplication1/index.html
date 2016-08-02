@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="Script/ThirdParty/jquery-2.2.4.min.js"></script>
+    <script src="Script/ThirdParty/lodash.min.js"></script>
+    <script src="Script/ThirdParty/angular.min.js"></script>
+    <script src="Script/ThirdParty/snap.svg-min.js"></script>
+    <link href="Style/bootstrap.min.css" rel="stylesheet" />
+    <script src="Script/ThirdParty/bootstrap.min.js"></script>
+    <style>
+        .svg-container {
+            display: inline-block;
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            vertical-align: middle;
+            overflow: hidden;
+        }
+
+        .svg-content {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+
+</head>
+<body ng-app="orgChart">
+
+    <!--<div class="svg-container">
+        <graph id="svg1"></graph>
+    </div>-->
+    <div class="svg-container" style="width: 500px;">
+        <org-chart id="svg1"></org-chart>
+    </div>
+
+    <script src="Script/Core/OrgChart.js"></script>
+    <!--<script src="test.js"></script>-->
+    <!--<script src="Utility.js"></script>
+    <script src="graphDrawer.js"></script>-->
+</body>
+</html>
