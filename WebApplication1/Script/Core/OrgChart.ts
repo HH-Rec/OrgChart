@@ -173,6 +173,9 @@
 
             this.global.activeNode = null;
             this.global.lstNodes = new Array<Node>();
+            this.global.activeEdge = {};
+            this.global.activeEdge.start = null;
+            this.global.activeEdge.end = null;
         }
 
         private linkFn: ng.IDirectiveLinkFn = (scope: IOrgChartScope, element: ng.IAugmentedJQuery, attr: ng.IAttributes) => {
@@ -191,7 +194,7 @@
             var page = this.global.svg.snap.rect(0, 0, self.properties.page.width, self.properties.page.height).attr({ fill: self.properties.page.fill });
 
             page.click((arg) => {
-                self.global.activeNode = null;
+                self.global.activeNode = null;  
             });
 
             page.dblclick((arg) => {
@@ -200,9 +203,35 @@
                 var newNode = self.getNode(point.x, point.y);
 
                 self.global.lstNodes.push(newNode);
+                console.log("Add a new node : lstNodes.count = " + this.global.lstNodes.length);
             });
 
-            //this.drawToolbar();
+            $(document).on("keydown",(arg) => {
+                console.log("Key press : " + arg.key);
+
+                switch (arg.key) {
+                    case "Delete":
+                        {
+                            self.deleteNode();
+                        }
+                    case "c":       //Connect
+                    case "C":
+                        {
+                            break;
+                        }
+                    case "p":       //Pointer
+                    case "P":
+                        {
+                            break;
+                        }
+                }
+            });
+
+            page.mousemove((arg) => {
+                if (this.global.activeEdge.start !== null) {
+                    debugger;
+                }
+            });
         }
 
         private getClickedPosition(arg): Point {
@@ -215,31 +244,9 @@
         }
 
         private getNode(x: number, y: number): any {
-            var node = this.global.svg.snap.rect(x - this.properties.node.width / 2,
-                y - this.properties.node.height / 2,
-                this.properties.node.width,
-                this.properties.node.height).attr({ fill: this.properties.node.fill });
+            var node = this.global.svg.snap.rect(x - this.properties.node.width / 2, y - this.properties.node.height / 2, this.properties.node.width, this.properties.node.height).attr({ fill: this.properties.node.fill });
 
-            node.click(() => {
-                this.global.activeNode = node;
-            });
-
-            node.dblclick(() => {
-
-            });
-
-
-
-            var circleTopLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-            var circleTopCenter = this.global.svg.snap.circle(x, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-            var circleTopRight = this.global.svg.snap.circle(x + this.properties.node.width / 2, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-            var circleRight = this.global.svg.snap.circle(x + this.properties.node.width / 2, y, 10).attr({ fill: "yellow" });
-            var circleBottomRight = this.global.svg.snap.circle(x + this.properties.node.width / 2, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-            var circleBottomCenter = this.global.svg.snap.circle(x, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-            var circleBottomLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
-            var circleLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2, y, 10).attr({ fill: "yellow" });
-
-            var g = this.global.svg.snap.group(node, circleTopLeft, circleTopCenter, circleTopRight, circleRight, circleBottomRight, circleBottomCenter, circleBottomLeft, circleLeft);
+            var g = this.global.svg.snap.group(node);
 
             var move = (dx, dy) => {
                 var self = this;
@@ -251,18 +258,67 @@
             }
             var start = () => { g.data("origTransform", g.transform().local); }
             var stop = () => { }
-
-
             g.drag(move, start, stop);
+
+            this.global.activeNode = g;
+
+            node.click(() => {
+                this.global.activeNode = g;
+            });
+
+            g.mouseover(() => {
+                debugger;
+                //var circleTopLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+                var circleTopCenter = this.global.svg.snap.circle(x, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+                //var circleTopRight = this.global.svg.snap.circle(x + this.properties.node.width / 2, y - this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+                var circleRight = this.global.svg.snap.circle(x + this.properties.node.width / 2 - 10, y, 10).attr({ fill: "yellow" });
+
+
+                circleRight.drag(move, start, stop);
+
+                //var circleBottomRight = this.global.svg.snap.circle(x + this.properties.node.width / 2, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+                var circleBottomCenter = this.global.svg.snap.circle(x, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+                //var circleBottomLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2, y + this.properties.node.height / 2, 10).attr({ fill: "yellow" });
+                var circleLeft = this.global.svg.snap.circle(x - this.properties.node.width / 2 + 10, y, 10).attr({ fill: "yellow" });
+                circleLeft.click((arg) => {
+                    debugger;
+                    this.global.activeEdge.start = this.getClickedPosition(arg);
+                });
+
+                g.add(circleTopCenter, circleRight, circleBottomCenter, circleLeft);
+            });
+
+            g.mouseout(() => {
+                debugger;
+                g[1].remove();
+                g[1].remove();
+                g[1].remove();
+                g[1].remove();
+            });
+
+            g.mousemove(() => {
+                if (this.global.activeEdge.start !== null) {
+                    debugger;
+                }});
 
             return g;
         }
 
+        private deleteNode() {
+            var self = this;
+
+            if (self.global.activeNode !== null) {
+                _.remove(self.global.lstNodes,(item) => { return item.id === this.global.activeNode.id; });
+                self.global.activeNode.remove();
+                self.global.activeNode = null;
+                console.log("Remove active node : lstNodes.count = " + self.global.lstNodes.length);
+            }
+        }
 
         private drawToolbar() {
             var rect = this.global.svg.snap.circle(50, 50, 50);
             var pattern = this.global.svg.snap.image("Img/arrow.svg", 0, 0, 80, 80).pattern(0, 0, 80, 80);
-            rect.attr({ fill: pattern, stroke:"black",strokeWidth: 1 });
+            rect.attr({ fill: pattern, stroke: "black", strokeWidth: 1 });
         }
     }
 }
